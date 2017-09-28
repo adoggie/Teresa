@@ -1,0 +1,56 @@
+
+common_defs:
+  endpoints:
+#    - name: mq_koala_mas
+#      host: "rhinoceros/jiangxiaoyu@ytodev2"
+#      port: 5672
+#      address: mq_koala_mas;{create:always,node:{type:queue,durable:true}}
+#      type: qpid
+
+
+    - name: mq_gateway_1
+      host: "mq_server"
+      port: 5672
+      address: mq_gateway_1;{create:always,node:{type:queue,durable:false}}
+      type: qpid
+
+    - name: mq_gateway_broadcast
+      host: "mq_server"
+      port: 5672
+      address: mq_gateway_broadcast;{create:always,node:{type:topic,durable:false}}
+      type: qpid
+
+    - name: mq_messageserver
+      host: "mq_server"
+      port: 5672
+      address: mq_messageserver;{create:always,node:{type:queue,durable:false}}
+      type: qpid
+
+    - name: mq_user_event_listener
+      host: "mq_server"
+      port: 5672
+      address: mq_user_event_listener;{create:always,node:{type:topic,durable:false}}
+      type: qpid
+
+koala_mas:
+  endpoints:
+#    - name: mq_koala_mas
+#      af_mode: AF_READ
+    - name: mq_messageserver
+      af_mode: AF_WRITE
+
+#  endpoint_pairs:
+#    - call: mq_koala_mexs
+#      return: mq_koala_mas
+
+koala_mexs:
+  endpoints:
+    - name: mq_messageserver
+      af_mode: AF_READ
+    - name: mq_user_event_listener
+      af_mode: AF_READ
+    - name: mq_gateway_1
+      af_mode: AF_WRITE
+    - name: mq_gateway_broadcast
+      af_mode: AF_WRITE
+

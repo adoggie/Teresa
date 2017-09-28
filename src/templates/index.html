@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link rel="shortcut icon" href="/static/images/carrun_2x.png" />
+    <title>车载GPS轨迹查询</title>
+    <link type="text/css" rel="stylesheet" href="/static/style/common.css?v=20170527020">
+    <link type="text/css" rel="stylesheet" href="/static/style/blue.css?v=20170527020">
+    <link type="text/css" rel="stylesheet" href="/static/style/styles.css?v=20170527020">
+    <link rel="stylesheet" href="/static/js/lib/bootstrap/css/bootstrap.css">
+    <link rel="stylesheet" type="text/css" href="/static/js/lib/bootstrap/css/bootstrap-datetimepicker.min.css">
+    <link rel="stylesheet" type="text/css" href="/static/js/lib/jqueryui/jquery-ui.min.css">
+    <link rel="stylesheet" href="/static/style/font-awesome/css/font-awesome.min.css">
+    <script type="text/javascript"  src="/static/js/lib/jquery-1.11.1.min.js"></script>
+    <script type="text/javascript"  src="/static/js/lib/jqueryui/jquery-ui.min.js"></script>
+    <script type="text/javascript" src="/static/js/lib/bootstrap/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="/static/js/lib/bootstrap/js/bootstrap-datetimepicker.js"></script>
+    <script type="text/javascript" src="/static/js/lib/bootstrap/js/bootstrap-datetimepicker.zh-CN.js" charset="UTF-8"></script>
+</head>
+<body>
+<div class="myMap">
+    <div id="allmap" style="width:100%;height:100%;"></div>
+    <!--查询条件-->
+    <div class="manage">
+        <div class="container-fluid map-top" style="padding:0">
+                <div class="row horizontal-menu">
+                    <ul>
+                        <li>
+                            <a href="/teresa/index">全国监控</a>
+                        </li>
+                        <li>
+                            <a href="/teresa/replay" class="active">轨迹查询</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="date-time">
+                    <div class="col-md-6 new-date"></div>
+                    <div class="col-md-6 text-right" style="padding-right:100px;">
+                        <div class="date-hour date-time-hms">
+                            <span></span>
+                            <i></i>
+                        </div>
+                        <div>:</div>
+                        <div class="date-minute date-time-hms">
+                            <span></span>
+                            <i></i>
+                        </div>
+                        <div>:</div>
+                        <div class="date-second date-time-hms">
+                            <span></span>
+                            <i></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <div class="manageControl">
+            <div class="manageTop">
+                <div class="serviceName">车辆轨迹查询</div>
+                <div class="toggleInManage" data-toggle="collapse" data-target="#manageBottom"></div>
+            </div>
+            <div class="collapse in" id="manageBottom">
+                <div class="manageBottom">
+                    <div class="manageTab">
+                        <div class="trackTab" onClick="this.handleToggle">
+                            轨迹查询
+                        </div>
+                        <div class="pointerTabLeft"></div>
+                    </div>
+                    <div class="track visible">
+                        <div class="trackDatetime" style="margin-top: 20px;">
+                            <div class="datetitle text-right">开始时间：</div>
+                            <div class="input-append date datetimepicker" id="datetimepicker_start" data-date-format="yyyy-mm-dd hh:ii:ss">
+                                <input type="text" class="datetimeInput" size="16" value="" autocomplete="off" readonly>
+                                <span class="add-on datetimeBtn hidden">
+                                    <i class="icon-th"></i>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="start_error error"></div>
+                        <div class="trackDatetime">
+                            <div class="datetitle text-right">结束时间：</div>
+                            <div class="input-append date datetimepicker" id="datetimepicker_end" data-date-format="yyyy-mm-dd hh:ii:ss">
+                                <input type="text" class="datetimeInput" size="16" value="" autocomplete="off" readonly>
+                                <span class="add-on datetimeBtn hidden">
+                                    <i class="icon-th"></i>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="time_error error"></div>
+                        <div class="trackSearch">
+                            <div class="trackSearchTitle">
+                                <div class="datetitle text-right">车牌号：</div>
+                            </div>
+                            <input class="searchInputMonitor searchInputMonitor_2" placeholder="请输入关键字" autocomplete="off">
+                        </div>
+                        <div class="deviceName_error error"></div>
+                        <div class="trackSearch trackSearch2">
+                            <button type="button" class="truckbutton resetButton">重置</button>
+                            <button type="button" class="truckbutton searchButton">轨迹查询</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--轨迹回放-->
+    <div class="timeline">
+        <div class="timelineControl">
+            <div class="timelinePlay"></div>
+            <div class="timelineSlow"></div>
+            <div class="timelineQuick"></div>
+        </div>
+        <div class="timelineMain"></div>
+    </div>
+</div>
+<!--查询时间超过一天提示框-->
+<div class="modal fade" id="timeErrorModal" tabindex="-1" role="dialog" aria-labelledby="timeErrorModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id ="timeErrorModalLabel">提示</h4>
+            </div>
+            <div class="modal-body">
+                当前查询时间段仅支持24小时内，请重新选择时间段。
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--没有数据-->
+<div class="modal fade" id="noDataModal" tabindex="-1" role="dialog" aria-labelledby="noDataModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id ="noDataModalLabel">提示</h4>
+            </div>
+            <div class="modal-body">
+                该时间段内的车辆没有可显示的轨迹信息
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript" src="/static/js/app/mapControl.js?v=20170527020"></script>
+<script type="text/javascript" src="/static/js/app/urls.js?v=20170527020"></script>
+<script type="text/javascript" src="/static/js/app/track/trackanalysis.js?v=20170527020"></script>
+<script type="text/javascript" src="/static/js/app/track/trackcontent.js?v=20170527020"></script>
+<script type="text/javascript" src="/static/js/app/track/tracksearch.js?v=20170527020"></script>
+<script type="text/javascript" src="/static/js/app/track/trackviews.js?v=20170527020"></script>
+<script type="text/javascript" src="/static/js/app/timeline.js?v=20170527020"></script>
+<script type="text/javascript" src="/static/js/app/monitor/monitoronlinecontent.js?v=20170527020"></script>
+<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=KTjrDfYd1PICrZGTw49k6sczPBbit5gL&callback=mapControl.initMap"></script>
+<script type="text/javascript" src="/static/js/app.js?v=20170527020"></script>
+<script type="text/javascript" src="/static/js/cofing.js?v=20170527020"></script>
+
+    <script>
+		urls.serverUrl ="{{rhino_server}}";
+	</script>
+</body>
+</html>

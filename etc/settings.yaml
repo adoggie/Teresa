@@ -1,0 +1,244 @@
+
+app_name: 'teresa_server'
+project_name: 'teresa'
+project_version: '0.1'
+
+logging:
+  level: DEBUG
+  format: '%(levelname)s %(asctime)s  %(message)s'
+  message_format: '%(project_name)s:%(project_version)s %(app_id)s %(_filename)s:%(_lineno)d [%(tags)s] '
+
+  filters:
+    trans:
+      tag: 'TRANS:'   # tag 过滤
+  handlers:
+    - type: file
+      enable: true
+      filename: 'server.log'
+      encoding: 'UTF-8'
+      max_bytes: 67108864 # 64MB
+      backup_count: 10
+
+    - type: file
+      enable: true
+      filename: 'trans.log'   #运单日志跟踪
+      encoding: 'UTF-8'
+      max_bytes: 67108864 # 64MB
+      backup_count: 10
+      filter: 'trans'
+
+    - type: logtail
+      enable: false
+      logstore: 'abc'
+      access_token: 'xxxx'
+      scret_key: 'xxxx'
+      uri: 'xxxx'
+
+    - type: console
+      enable: false
+
+http_trace: #自动日志记录
+  level: DEBUG
+  request:
+    options:
+      header:  false
+      body:  true
+      max_size: 500 # 最大数据包长度
+    urls:
+      - match: '/'
+      - match: 'zoo/cat'
+        body:  true
+
+  response:
+    options:
+      header:  false
+      body:  true
+      max_size: 500 # 最大数据包长度
+    urls:
+      - match: '/'
+      - match: 'zoo/cat'
+        body:  true
+
+celery_trace: # celery 调用日志记录
+  level: 'DEBUG'
+  client_max_size: 500 # 0 :不记录数据参数
+  server_max_size: 500 # 日志记录 最大数据包长度
+
+
+celery_config:
+  services:
+    - name: 'test_server'
+      route:
+        type: 'redis'
+        broker: 'redis://127.0.0.1:6379/6'       #request queue
+        backend: 'redis://127.0.0.1:6379/7'
+      exchange:
+        name: 'tasks'
+        type: 'direct' # topic,fanout,headers,direct
+      queues:
+        - name: 'sub_dash'
+          routing_key: 'sub_dash'
+      tasks:
+        - name: 'hello'
+          path: 'access.celery.hello'
+          queue: 'sub_dash'
+          routing_key: 'sub_dash'
+      default_queue:  'default'
+
+  current: 'test_server' # 当前可用的celery服务
+
+http:
+  host : ''
+  port : 5555
+  threaded: false
+  debug: false
+
+cache_config:
+  default:
+    type: redis
+    host: '127.0.0.1'
+    port: 5603
+    password: '1111'
+    enable: true
+
+#mysql://username:password@hostname/database
+#sqlite:////absolute/path/to/database
+#postgresql://username:password@hostname/database
+
+flask_config:
+  active: default
+  default:
+    REDIS_URL : "redis://:@localhost:6379/1"
+    SQLALCHEMY_DATABASE_URI : 'sqlite:////tmp/test.db'
+    SQLALCHEMY_BINDS:
+      users:        'mysqldb://localhost/users'
+      appmeta:      'sqlite:////path/to/appmeta.db'
+
+#    SQLALCHEMY_TRACK_MODIFICATIONS : true
+#    SQLALCHEMY_COMMIT_ON_TEARDOWN : false  #禁止打开
+    SECRET_KEY : "abc"
+    TOKEN_EXPIRE : 3600*2
+    MAX_CONTENT_LENGTH : 5242880
+    UPLOAD_FOLDER : 'upload/'
+    FRONT_URL :  'tender_manage/'
+    DEBUG_TB_PROFILER_ENABLED : true
+    DEBUG : true
+    TEMPLATES_AUTO_RELOAD : true
+
+  devel:
+
+blueprint_routes:
+  - package: 'service'
+    url: '/'
+    modules:
+      - name: 'api'
+        url: 'teresa'
+        routes:
+          - url: '/voucher/'   # url name
+            name: 'get_voucher'   # function name
+            methods: 'GET,POST'
+            notes: '登陆接口'
+
+          - url: '/waybill/'
+            name: 'get_waybills'
+            methods: 'GET,POST'
+            notes: '获取运单列表'
+
+          - url: '/stations/'
+            name: 'get_stations'
+            methods: 'GET,POST'
+            notes: '获取转运中心列表'
+
+      - name: 'view'
+        url: 'teresa'
+        routes:
+          - url: '/index'
+            name: 'index'
+            methods: ''
+            notes: '网站入口'
+
+          - url: '/replay'
+            name: 'replay'
+            methods: ''
+            notes: '轨迹回放入口'
+
+kafka_config:
+  - topic: 'test'
+    group: 'abcdef'  # simple_consumer if group is null
+#    hosts: '106.14.82.12:9092'
+#    zookeepers: 'wallizard.com:2181'
+    hosts: 'localhost:9092'
+    zookeepers: 'localhost:2181'
+    exec_thread_nr: 1 #执行线程数
+    entry:  'access.kafka.test.get_message' # last unit< get_message> is function object
+    enable: true
+    corutine: false # 是否启用协程
+    access: 'read,write' # 访问模式，用于发送 或接收
+
+amqp_config:
+  - name: 'mq_2'
+    type: 'qpid'
+    host: 'ytodev2'
+    port: 5672
+    address: "mq_2; {create: always, node: {type: queue,durable:true}}"
+#    address: "mq_adapters; {create: always, node: {type: topic,durable:false}}"
+
+#    address="mq_gwa_broadcast;{create:always,node:{type:topic,durable:true}}"
+    exec_thread_nr: 1 #执行线程数
+    entry:  'access.amqp.channel.data_entry' # last unit< get_message> is function object
+    enable: true
+    read: true
+    write: false
+
+zookeeper_config:
+  hosts: 'localhost:2181'
+  root: '/camel/carrier'
+
+inspection:
+  health_interval: 20
+
+aggregator:
+  data_span: 5 # 5分钟累积
+  distance: 2 # 两个时间累积段之前的数据开始写入持久层
+  data_path: 'cache'
+  backup_path: 'back'
+  persistence:
+    handlers:
+      - name: 'pgsql'
+        host: 'ytodev2'
+        port: '5432'
+        dbname: 'rhino'
+        user: 'postgres'
+        password: '13916624477'
+        entry: 'service.persistence.PostgresHandler'
+        days_mo: 1 # 默认每隔一天存放到一张表
+
+
+services:
+  rhino_server:
+    url: 'http://118.190.113.106:8088/'
+    auth_url: 'http://118.190.113.106:8088/rhino/auth/tickets'
+    app_id: 'teresa'
+    secret_key: '57a6a0811829faf34a78ca625c383ec9'
+    user: 'admin'  # 以root用户登陆，可获取所有车辆  （老locuser服务在用户登陆获取ticket时将导入root所有车辆)
+
+  teresa_server:
+    url: '/'
+
+
+
+
+yonmen_config:
+  operator_url: 'https://operator.yonmen.com/auth/web'
+  user: 'teresa_gps'
+  password: 'CamelTeresaGPS'
+  trans_query_size: 10000
+  trans_query_interval: 600  # ten minutes
+
+# qpid-receive -b localhost:5672 -a "mq_test;{create:always,node:{type:queue,durable:true}}"
+
+
+
+
+
+

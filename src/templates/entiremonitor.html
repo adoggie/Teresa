@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<link rel="shortcut icon" href="/static/images/carrun_2x.png" />
+	<title>全国监控</title>
+	<link rel="stylesheet" href="/static/style/font-awesome/css/font-awesome.min.css">
+	<link rel="stylesheet" type="text/css" href="/static/js/lib/jqueryui/jquery-ui.min.css">
+	<link rel="stylesheet" href="/static/style/bootstrap.css">
+	<link rel="stylesheet" href="/static/style/common.css?v=20170527020">
+	<link rel="stylesheet" href="/static/style/styles.css?v=20170527020">
+	
+	<script type="text/javascript" src="/static/js/lib/jquery-1.11.1.min.js"></script>
+	<script type="text/javascript"  src="/static/js/lib/jqueryui/jquery-ui.min.js"></script>
+	<script type="text/javascript" src="/static/js/lib/jquery.freezeheader.js"></script>
+	<link rel="stylesheet" href="http://api.map.baidu.com/library/DrawingManager/1.4/src/DrawingManager_min.css" />
+</head>
+<body class="entiremonitorBody">
+	<div class="myMap">
+    	<div id="allmap" style="width:100%;height:100%;"></div>
+    	<div class="manage">
+    		<div class="container-fluid map-top">
+				<div class="row horizontal-menu">
+					<ul>
+						<li>
+							<a href="/teresa/index" class="active">全国监控</a>
+						</li>
+						<li>
+							<a href="/teresa/replay">轨迹查询</a>
+						</li>
+					</ul>
+				</div>
+				<div class="row date-time">
+					<div class="col-md-6 new-date"></div>
+					<div class="col-md-6 text-right">
+						<div class="date-hour date-time-hms">
+							<span></span>
+							<i></i>
+						</div>
+						<div>:</div>
+						<div class="date-minute date-time-hms">
+							<span></span>
+							<i></i>
+						</div>
+						<div>:</div>
+						<div class="date-second date-time-hms">
+							<span></span>
+							<i></i>
+						</div>
+						<div class="refresh">
+							<span>距离下一次刷新还有</span><i>120</i><span>秒</span>
+							<button class="btn btn-default labour-refresh fa fa-refresh" type="button"></button>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="select-nor">
+				<form class="form-inline">
+					<div class="form-group">
+						<select class="select-type form-control">
+				    		<option value="0" selected="true">车辆</option>
+				    		<option value="1">转运中心</option>
+				    	</select>
+					</div>
+
+
+					<div oninput="delva(this);" onmouseleave="delfocus(this);">
+
+					<div class="form-group">
+						<input type="text" class="search-key form-control" autocomplete="off" placeholder='请输入车牌号' id="pl">
+						<input type="text" class="transitCenter hidden">
+						<!-- <i class="fa fa-times resetbutton"></i> -->
+					</div>
+					<div style="visibility:hidden;font-size: 14px; width: 20px;cursor:pointer;" id="quickdemlete">X</div>
+                    
+                     </div>
+
+					<button type="button" class="fa fa-search search form-control"></button>
+				</form>
+			</div>
+			<div class="checkbox frame-search-car" >
+			    <label>
+			      <input type="checkbox" class="region-select">画框选车
+			    </label>
+			</div>
+    	</div>
+    	<div class="container-fluid map-bottom show">
+    		<div class="row all-cars">
+    			<div class="map-bottom-tab">
+	    			<div class="col-md-8">
+		    			<ul class="car-data-list">
+			    			<li class="active car-all" data-num="0">
+			    				<div class="left-border"></div>
+			    				<div class="bottom-tab">全部<span class="all">628</span>辆</div>
+			    				<div class="right-border"></div>
+			    			</li>
+			    			<li class="car-running" data-num="1">
+			    				<div class="left-border"></div>
+			    				<div class="bottom-tab">行驶<span class="running" style="color: #5a49fb;font-weight: 900">68</span>辆</div>
+			    				<div class="right-border"></div>
+			    			</li>
+			    			<li class="car-stopped" data-num="2">
+			    				<div class="left-border"></div>
+			    				<div class="bottom-tab">静止<span class="stopped" style="color: #f7461c;font-weight: 900">68</span>辆</div>
+			    				<div class="right-border"></div>
+			    			</li>
+			    			<li class="car-offline" data-num="3">
+			    				<div class="left-border"></div>
+			    				<div class="bottom-tab">离线<span class="offline" style="color: #ccc;font-weight: 900">68</span>辆</div>
+			    				<div class="right-border"></div>
+			    			</li>
+			    			<li class="transit-center-tab hidden" data-num="4">
+			    				<div class="left-border"></div>
+			    				<div class="bottom-tab">该中心共有<span class="transit-center-car" style="color: #ccc;font-weight: 900"></span>辆</div>
+			    				<div class="right-border"></div>
+			    			</li>
+			    		</ul>
+		    		</div>
+		    		<div class="col-md-4 text-right">
+		    			<button type="button" class="fa fa-chevron-down btn btn-default car-list-button active"></button>
+		    		</div>
+	    		</div>
+	    		<div class="map-bottom-nor">
+	    			<table class="car-table" class="display" width="100%">
+	    				<thead>
+	    					<th>序号</th>
+	    					<th>操作</th>
+	    					<th>车牌号</th>
+	    					<th>承运商</th>
+	    					<th>发动机</th>
+	    					<th>当前位置</th>
+	    					<th>定位时间</th>
+	    					<th>运单号</th>
+	    					<th>车签号</th>
+	    					<th>线路名</th>
+	    				</thead>
+	    				<tbody></tbody>
+	    			</table>
+	    		</div>
+    		</div>
+    		<div class="row seach-cars">    		
+	    		<div class="map-bottom-tab">
+	    			<div class="col-md-8">
+		    			<ul class="car-data-list">
+			    			<li class="active car-all" data-num="0">
+			    				<div class="left-border"></div>
+			    				<div class="bottom-tab"><i>全部</i><span class="all">628</span>辆</div>
+			    				<div class="right-border"></div>
+			    			</li>
+							<li class="car-running" data-num="1">
+								<div class="left-border"></div>
+								<div class="bottom-tab">行驶<span class="running" style="color: #5a49fb;font-weight: 900">68</span>辆</div>
+								<div class="right-border"></div>
+							</li>
+							<li class="car-stopped" data-num="2">
+								<div class="left-border"></div>
+								<div class="bottom-tab">静止<span class="stopped" style="color: #f7461c;font-weight: 900">68</span>辆</div>
+								<div class="right-border"></div>
+							</li>
+							<li class="car-offline" data-num="3">
+								<div class="left-border"></div>
+								<div class="bottom-tab">离线<span class="offline" style="color: #ccc;font-weight: 900">68</span>辆</div>
+								<div class="right-border"></div>
+							</li>
+			    			<li class="transit-center-tab hidden" data-num="4">
+			    				<div class="left-border"></div>
+			    				<div class="bottom-tab">该中心共有<span class="transit-center-car" style="color: #ccc;font-weight: 900"></span>辆</div>
+			    				<div class="right-border"></div>
+			    			</li>
+			    		</ul>
+		    		</div>
+		    		<div class="col-md-4 text-right">
+		    			<button type="button" class="fa fa-times btn btn-default seach-cars-button"></button>
+		    		</div>
+	    		</div>
+	    		<div class="map-bottom-nor hidden">
+	    			<table class="car-table" class="display" width="100%">
+	    				<thead>
+	    					<th>序号</th>
+	    					<th>操作</th>
+	    					<th>车牌号</th>
+	    					<th>承运商</th>
+	    					<th>发动机</th>
+	    					<th>当前位置</th>
+	    					<th>定位时间</th>
+	    					<th>运单号</th>
+	    					<th>车签号</th>
+	    					<th>线路名</th>
+	    				</thead>
+	    				<tbody></tbody>
+	    			</table>
+	    		</div>
+    		</div>
+		</div>
+    	
+	</div>
+	<script type="text/javascript" src="/static/js/app/mapControl.js?v=20170527020"></script>
+	<script type="text/javascript" src="/static/js/app/teresa/urls.js?v=20170527020"></script>
+	<script type="text/javascript" src="/static/js/app/rhino/urls.js?v=20170527020"></script>
+	<script type="text/javascript" src="/static/js/app/rhino/rhinosearch.js?v=20170527020"></script>
+	<script type="text/javascript" src="/static/js/app/teresa/teresasearch.js?v=20170527020"></script>
+	<script type="text/javascript" src="/static/js/app/region/regionselectcar.js?v=20170527020"></script>
+	<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=KTjrDfYd1PICrZGTw49k6sczPBbit5gL&callback=mapControl.initMap"></script>
+	<script type="text/javascript" src="/static/js/base.js?v=20170527020"></script>
+	<script type="text/javascript" src="/static/js/cofing.js?v=20170527020"></script>
+
+	<script>
+		rhionUrls.serverUrl ="{{rhino_server}}";
+//		teresaUrls.serverUrl ="{{teresa_server}}";
+	</script>
+</body>
+</html>

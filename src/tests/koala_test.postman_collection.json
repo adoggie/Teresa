@@ -1,0 +1,71 @@
+{
+	"id": "26048c0e-e48d-9fd0-76e8-ad317d30bd4d",
+	"name": "koala_test",
+	"description": "",
+	"order": [
+		"73baebea-0f86-d3e8-aff0-470211f2241a",
+		"7e225d01-76a6-0076-d944-16aee7f838a8",
+		"8d208405-702a-3152-57dd-b62037e23157"
+	],
+	"folders": [],
+	"timestamp": 1502532843024,
+	"owner": "1906523",
+	"public": false,
+	"requests": [
+		{
+			"id": "73baebea-0f86-d3e8-aff0-470211f2241a",
+			"headers": "",
+			"url": "http://127.0.0.1:15555/koala/api/mas/tickets?app_id=camel&secret_key=111111&user_id=admin",
+			"preRequestScript": null,
+			"pathVariables": {},
+			"method": "GET",
+			"data": null,
+			"dataMode": "params",
+			"tests": null,
+			"currentHelper": "normal",
+			"helperAttributes": {},
+			"time": 1502588738180,
+			"name": "mas_getTickets",
+			"description": "",
+			"collectionId": "26048c0e-e48d-9fd0-76e8-ad317d30bd4d",
+			"responses": []
+		},
+		{
+			"id": "7e225d01-76a6-0076-d944-16aee7f838a8",
+			"headers": "",
+			"url": "http://127.0.0.1:15555/koala/api/mas/messages?ticket=eyJyZWFsbSI6ICJjYW1lbCIsICJhcHBfaWQiOiAiY2FtZWwiLCAiY3JlYXRlX3RpbWUiOiAxNTAyNTUyNDk3LCAidGltZSI6IDE1MDI1NTI1MTksICJleHBpcmVfdGltZSI6IDE1MDM0MTY0OTcsICJ1c2VyX2lkIjogImFkbWluIn0=&realm=&users=user1,user2&title=this is a test,周鑫&content=Text is Text,王如风&expire=0&execute=0",
+			"preRequestScript": null,
+			"pathVariables": {},
+			"method": "GET",
+			"data": null,
+			"dataMode": "params",
+			"tests": null,
+			"currentHelper": "normal",
+			"helperAttributes": {},
+			"time": 1502788190377,
+			"name": "message_send",
+			"description": "",
+			"collectionId": "26048c0e-e48d-9fd0-76e8-ad317d30bd4d",
+			"responses": []
+		},
+		{
+			"id": "8d208405-702a-3152-57dd-b62037e23157",
+			"headers": "",
+			"url": "http://127.0.0.1:15555/koala/api/mas/messages/ack?ticket=eyJyZWFsbSI6ICJjYW1lbCIsICJhcHBfaWQiOiAiY2FtZWwiLCAiY3JlYXRlX3RpbWUiOiAxNTAyNTUyNDk3LCAidGltZSI6IDE1MDI1NTI1MTksICJleHBpcmVfdGltZSI6IDE1MDM0MTY0OTcsICJ1c2VyX2lkIjogImFkbWluIn0=&sids=011111",
+			"preRequestScript": null,
+			"pathVariables": {},
+			"method": "POST",
+			"data": null,
+			"dataMode": "params",
+			"version": 2,
+			"tests": null,
+			"currentHelper": "normal",
+			"helperAttributes": {},
+			"time": 1502788192514,
+			"name": "message_ack",
+			"description": "",
+			"collectionId": "26048c0e-e48d-9fd0-76e8-ad317d30bd4d",
+			"responses": []
+		}
+	]
+}
